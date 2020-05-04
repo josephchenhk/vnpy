@@ -1,4 +1,7 @@
 # flake8: noqa
+from examples.vn_trader.demo_script import run
+from vnpy.app.script_trader import ScriptEngine
+
 from vnpy.event import EventEngine
 
 from vnpy.trader.engine import MainEngine
@@ -114,6 +117,21 @@ def main():
 
     qapp.exec()
 
+def main2():
+    event_engine = EventEngine()
+    main_engine = MainEngine(event_engine)
+    main_engine.add_gateway(FutuGateway)
+    # futu_gateway = FutuGateway(event_engine)
+    setting = {"地址":"127.0.0.1",
+        "端口":11111,
+        "市场":"US",
+        "密码":123,
+        "环境":"REAL"}
+    # futu_gateway.connect(setting)
+    main_engine.connect(setting=setting, gateway_name="FUTU")
+    script_engine = ScriptEngine(main_engine, event_engine)
+    run(script_engine)
+
 
 if __name__ == "__main__":
-    main()
+    main2()
