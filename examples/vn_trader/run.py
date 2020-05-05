@@ -1,4 +1,7 @@
 # flake8: noqa
+import json
+import sys
+from time import sleep
 from examples.vn_trader.demo_script import run
 from vnpy.app.script_trader import ScriptEngine
 
@@ -54,7 +57,7 @@ from vnpy.gateway.futu import FutuGateway
 # from vnpy.app.chart_wizard import ChartWizardApp
 # from vnpy.app.excel_rtd import ExcelRtdApp
 from vnpy.app.data_manager import DataManagerApp
-
+from vnpy.trader.utility import TEMP_DIR
 
 def main():
     """"""
@@ -121,16 +124,19 @@ def main2():
     event_engine = EventEngine()
     main_engine = MainEngine(event_engine)
     main_engine.add_gateway(FutuGateway)
-    # futu_gateway = FutuGateway(event_engine)
-    setting = {"地址":"127.0.0.1",
-        "端口":11111,
-        "市场":"US",
-        "密码":123,
-        "环境":"REAL"}
-    # futu_gateway.connect(setting)
-    main_engine.connect(setting=setting, gateway_name="FUTU")
-    script_engine = ScriptEngine(main_engine, event_engine)
-    run(script_engine)
+    # setting = {"地址":"127.0.0.1",
+    #     "端口":11111,
+    #     "市场":"HK",
+    #     "密码":123,
+    #     "环境":"REAL"}
+    with open(f'{TEMP_DIR}/connect_futu.json') as json_file:
+        setting = json.load(json_file)
+        script_engine = ScriptEngine(main_engine, event_engine)
+        script_engine.connect_gateway(setting=setting, gateway_name="FUTU")
+        script_engine.write_log("连接FUTU接口")
+        sleep(60)
+        run(script_engine)
+        script_engine.start_strategy(script_path="demo_script.py")
 
 
 if __name__ == "__main__":
